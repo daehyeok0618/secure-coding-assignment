@@ -1,4 +1,5 @@
 import sqlite3
+import bcrypt
 import uuid
 from flask import Flask, render_template, request, redirect, url_for, session, flash, g
 from flask_socketio import SocketIO, send
@@ -79,6 +80,17 @@ class RegisterForm(FlaskForm):
     username = StringField('사용자명', validators=[DataRequired()])
     password = PasswordField('비밀번호', validators=[DataRequired()])
 
+# 비밀번호 해시화 함수
+def hash_password(password):
+    salt = bcrypt.gensalt()
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return hashed_password
+
+# 비밀번호 검증 함수
+def check_password(hashed_password, password):
+    return bcrypt.checkpw(password.encode('utf-8'), hashed_password)
+
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
@@ -92,15 +104,17 @@ def register():
         if cursor.fetchone() is not None:
             flash('이미 존재하는 사용자명입니다.')
             return redirect(url_for('register'))
+
+        # 비밀번호 해시화
+        hashed_password = hash_password(password)
+
         user_id = str(uuid.uuid4())
         cursor.execute("INSERT INTO user (id, username, password) VALUES (?, ?, ?)",
-                       (user_id, username, password))
+                       (user_id, username,hashed_password))
         db.commit()
         flash('회원가입이 완료되었습니다. 로그인 해주세요.')
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
-
-# 로그인
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = RegisterForm()  # 폼 객체를 생성
@@ -109,16 +123,29 @@ def login():
         password = form.password.data
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("SELECT * FROM user WHERE username = ? AND password = ?", (username, password))
+        
+        # 사용자명으로 사용자 검색 (비밀번호는 비교하지 않음)
+        cursor.execute("SELECT * FROM user WHERE username = ?", (username,))
         user = cursor.fetchone()
+
         if user:
-            session['user_id'] = user['id']
-            flash('로그인 성공!')
-            return redirect(url_for('dashboard'))
+            # 데이터베이스에 저장된 해시된 비밀번호를 가져옵니다.
+            stored_password_hash = user['password']
+            
+            # 비밀번호 검증 (bcrypt 사용)
+            if check_password(stored_password_hash, password):  # 비밀번호 해시와 비교
+                session['user_id'] = user['id']
+                flash('로그인 성공!')
+                return redirect(url_for('dashboard'))
+            else:
+                flash('비밀번호가 올바르지 않습니다.')
         else:
-            flash('아이디 또는 비밀번호가 올바르지 않습니다.')
-            return redirect(url_for('login'))
+            flash('아이디가 존재하지 않습니다.')
+        
+        return redirect(url_for('login'))
+    
     return render_template('login.html', form=form)  # form 객체를 템플릿에 전달
+
 
 # 로그아웃
 @app.route('/logout')
