@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% block title %}대시보드{% endblock %}
 {% block content %}
+{% if user.is_admin %}
+    <a href="{{ url_for('view_reports') }}">신고 목록 보기 (관리자)</a>
+    <a href="{{ url_for('view_banned_users') }}">BAN된 사용자 목록 보기</a>
+{% endif %}
 <h2>대시보드</h2>
 <h3>등록된 상품</h3>
 <ul>

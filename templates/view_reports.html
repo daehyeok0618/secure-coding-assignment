@@ -1,0 +1,46 @@
+<!-- templates/view_reports.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>신고 목록</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+        th { background-color: #f0f0f0; }
+        .back-link { margin-top: 20px; display: inline-block; }
+    </style>
+</head>
+<body>
+    <h1>신고 목록</h1>
+
+    {% if reports %}
+        <table>
+            <thead>
+                <tr>
+                    <th>신고 ID</th>
+                    <th>신고자</th>
+                    <th>신고 대상</th>
+                    <th>사유</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for report in reports %}
+                    <tr>
+                        <td>{{ report.id }}</td>
+                        <td>{{ report.reporter_username or report.reporter_id }}</td>
+                        <td>{{ report.target_username or report.target_id }}</td>
+                        <td>{{ report.reason }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>등록된 신고가 없습니다.</p>
+    {% endif %}
+
+    <a href="{{ url_for('dashboard') }}" class="back-link">← 대시보드로 돌아가기</a>
+</body>
+</html>

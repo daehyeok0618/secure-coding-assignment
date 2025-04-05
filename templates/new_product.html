@@ -10,8 +10,8 @@
     <!-- 상품 설명 -->
     설명: {{ form.description }}<br>
     
-    <!-- 상품 가격 -->
-    가격: {{ form.price }}<br>
+     <!-- 상품 가격 (정수만 입력 가능) -->
+    가격: {{ form.price(class="price-input", type="number", min="1", step="1") }}<br>
 
 	<button type="submit">등록하기</button>
 </form>

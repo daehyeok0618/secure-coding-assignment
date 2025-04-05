@@ -4,5 +4,27 @@
 <h2>{{ product.title }}</h2>
 <p>{{ product.description }}</p>
 <p>가격: {{ product.price }}</p>
-<p>판매자: {{ seller.username if seller else '알 수 없음' }}</p>
+<p>판매자: {% if seller %}
+    <a href="{{ url_for('profile', username=seller['username']) }}">
+        {{ seller['username'] }}
+    </a>
+{% else %}
+    알 수 없음
+{% endif %}
+</p>
+{% if session['user_id'] == product['seller_id'] %}
+<div class="d-flex gap-2 mt-3">
+    <!-- 수정 버튼 -->
+    <form action="{{ url_for('edit_product', product_id=product.id) }}" method="get">
+        <button type="submit" class="btn btn-primary">수정</button>
+    </form>
+
+    <!-- 삭제 버튼 -->
+    <form action="{{ url_for('delete_product', product_id=product['id']) }}" method="POST" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-danger">삭제</button>
+    </form>
+</div>
+{% endif %}
+
 {% endblock %}

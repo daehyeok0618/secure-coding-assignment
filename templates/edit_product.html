@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}상품 수정{% endblock %}
+{% block content %}
+<h2>상품 수정</h2>
+<form method="post">
+	{{ form.hidden_tag() }}  <!-- CSRF 토큰 추가 -->
+  <!-- 상품 제목 -->
+    제목: {{ form.title }}<br>
+    
+    <!-- 상품 설명 -->
+    설명: {{ form.description }}<br>
+    
+     <!-- 상품 가격 (정수만 입력 가능) -->
+     가격: {{ form.price(class="price-input", type="number", min="1", step="1") }}<br>
+
+	<button type="submit">수정하기</button>
+</form>
+{% endblock %}

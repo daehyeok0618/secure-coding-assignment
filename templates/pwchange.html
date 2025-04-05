@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}비밀번호 관리{% endblock %}
+{% block content %}
+<h2>비밀번호 관리</h2>
+<p>사용자명: {{ user.username }}</p>
+<form method="post">
+  {{ form.hidden_tag() }}  <!-- CSRF 토큰 추가 -->
+  <label>현재 비밀번호: </label><br>
+  <input type="password" name="current_password" required><br>
+
+  <label>새로운 비밀번호: </label><br>
+  <input type="password" name="new_password" required><br>
+
+  <label>새로운 비밀번호 확인: </label><br>
+  <input type="password" name="confirm_password" required><br>
+  <button type="submit">비밀번호 변경</button>
+</form>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}BAN된 사용자 목록{% endblock %}
+
+{% block content %}
+<h2>BAN된 사용자 목록</h2>
+<table>
+    <thead>
+        <tr>
+            <th>사용자명</th>
+            <th>소개글</th>
+            <th>액션</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in banned_users %}
+        <tr>
+            <td>{{ user['username'] }}</td>
+            <td>{{ user['bio'] or '소개글 없음' }}</td>
+            <td>
+                <form method="POST" action="{{ url_for('unban_user') }}">
+                    {{ forms[user['username']].hidden_tag() }}
+                    <button type="submit" class="btn btn-success">BAN 해제</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{{ url_for('dashboard') }}">대시보드로 돌아가기</a>
+{% endblock %}
